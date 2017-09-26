@@ -1,13 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.SharePoint.Client;
 using Newtonsoft.Json.Linq;
-using System;
 using System.Net;
 using System.Security;
+using System.Web.Script.Serialization;
 
 namespace SharePoint_test
 {
@@ -25,12 +22,50 @@ namespace SharePoint_test
             }
             var credentials = new SharePointOnlineCredentials(userName, securePassword);
 
-            var list = GetList(webUri, credentials, "Especialistas");
+            var list = GetList(webUri, credentials, "ProfesionalCompleto");
+            var list2 = GetList(webUri, credentials, "Especialidades");
+            var list3 = GetList(webUri, credentials, "SucursalesLista");
+            List<Doctor> listaDocs = new List<Doctor>();
             //print List title
-            IEnumerable<JToken> b = list;
-            foreach(var a in b)
+
+            foreach (var g in list3)
             {
-                Console.WriteLine(a);
+                Console.WriteLine(g["Title"]);
+                
+            }
+            Console.WriteLine(" ");
+            IEnumerable<JToken> b = list;
+            foreach (var g in list2)
+            {
+                Console.WriteLine(g["Title"]);
+
+            }
+            Console.WriteLine(" ");
+            foreach (var a in b)
+            {
+                
+                Doctor docAgregado = new Doctor();
+                docAgregado.NombreCompleto = a["Title"].ToString();
+                docAgregado.Especialidad = a["Especialidad"].ToString();
+                docAgregado.Dias = a["DiasDeAtencion"].ToString();
+                docAgregado.HoraEntrada = int.Parse(a["HoraEntrada"].ToString());
+                docAgregado.HoraSalida = int.Parse(a["HoraSalida"].ToString());
+                listaDocs.Add(docAgregado);
+                /*Console.Write(a["Title"]);
+                Console.Write("----");
+                Console.Write(a["Especialidad"]);
+                Console.Write("----");
+                Console.Write(a["DiasDeAtencion"]);
+                Console.Write("----");
+                Console.Write(a["HoraEntrada"]);
+                Console.Write("----");
+                Console.Write(a["HoraSalida"]);
+                Console.WriteLine(" ");*/
+            }
+
+            foreach (var doc in listaDocs)
+            {
+                Console.WriteLine(doc.ToString());
             }
             //Console.WriteLine();
             Console.ReadKey();
@@ -61,6 +96,19 @@ namespace SharePoint_test
                 var t = JToken.Parse(result);
                 return t["d"]["results"];
             }
+        }
+    }
+    public class Doctor
+    {
+        public string NombreCompleto { get; set; }
+        public string Especialidad{ get; set; }
+        public string Dias{ get; set; }
+        public int HoraEntrada{ get; set; }
+        public int HoraSalida { get; set; }
+
+        public override string ToString()
+        {
+            return "Nombre y Apellido : " + this.NombreCompleto + " Especialidad: " + this.Especialidad + " Dias que trabaja: " + this.Dias + " Horarios: " + this.HoraEntrada + " a " + this.HoraSalida;
         }
     }
 }
