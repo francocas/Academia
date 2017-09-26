@@ -1,0 +1,66 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.SharePoint.Client;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Net;
+using System.Security;
+
+namespace SharePoint_test
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var webUri = new Uri("https://softtekssh.sharepoint.com/sites/Academia/Testing/Grupo1");
+            const string userName = "smo-sitiodeprueba@softtekssh.onmicrosoft.com";
+            const string password = "Softtek2017!";
+            var securePassword = new SecureString();
+            foreach (var c in password)
+            {
+                securePassword.AppendChar(c);
+            }
+            var credentials = new SharePointOnlineCredentials(userName, securePassword);
+
+            var list = GetList(webUri, credentials, "Especialistas");
+            //print List title
+            IEnumerable<JToken> b = list;
+            foreach(var a in b)
+            {
+                Console.WriteLine(a);
+            }
+            //Console.WriteLine();
+            Console.ReadKey();
+            //IEnumerable<JToken> d = b.Children 
+            /*foreach (var a in b)
+            {
+                foreach(var z in a)
+                {
+                    Console.WriteLine(z["Especialidad"]);
+                }
+
+            }
+            Console.WriteLine(list["Title"]);*/
+            Console.ReadLine();
+        }
+
+        public static JToken GetList(Uri webUri, ICredentials credentials, string listTitle)
+        {
+            using (var client = new WebClient())
+            {
+                client.Headers.Add("X-FORMS_BASED_AUTH_ACCEPTED", "f");
+                client.Credentials = credentials;
+                client.Headers.Add(HttpRequestHeader.ContentType, "application/json;odata=verbose");
+                client.Headers.Add(HttpRequestHeader.Accept, "application/json;odata=verbose");
+                string u = webUri + string.Format("/_api/web/lists/getbytitle('{0}')/items", listTitle);
+                var endpointUri = new Uri(u);
+                var result = client.DownloadString(endpointUri);
+                var t = JToken.Parse(result);
+                return t["d"]["results"];
+            }
+        }
+    }
+}
