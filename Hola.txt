@@ -12,6 +12,41 @@ namespace SharePoint_test
     {
         static void Main(string[] args)
         {
+            Doctor c = new Doctor();
+            foreach(var a in c.GetDoctores())
+            {
+                Console.WriteLine(a.ToString());
+            }
+
+            Console.WriteLine("  ");
+            foreach (var item in c.GetSucursales())
+            {
+                Console.WriteLine(item);
+            }
+            Console.WriteLine("  ");
+            foreach (var item in c.GetEspecialidades())
+            {
+                Console.WriteLine(item);
+            }
+            Console.WriteLine("  ");
+            Console.ReadKey();
+        }
+
+
+    }
+    public class Doctor
+    {
+        public string NombreCompleto { get; set; }
+        public string Especialidad{ get; set; }
+        public string Dias{ get; set; }
+
+        public string Sucursal { get; set; }
+        public int HoraEntrada{ get; set; }
+        public int HoraSalida { get; set; }
+
+        public List<Doctor> GetDoctores()
+        {
+            List<Doctor> listaDocs = new List<Doctor>();
             var webUri = new Uri("https://softtekssh.sharepoint.com/sites/Academia/Testing/Grupo1");
             const string userName = "smo-sitiodeprueba@softtekssh.onmicrosoft.com";
             const string password = "Softtek2017!";
@@ -21,35 +56,18 @@ namespace SharePoint_test
                 securePassword.AppendChar(c);
             }
             var credentials = new SharePointOnlineCredentials(userName, securePassword);
-
             var list = GetList(webUri, credentials, "ProfesionalCompleto");
-            var list2 = GetList(webUri, credentials, "Especialidades");
-            var list3 = GetList(webUri, credentials, "SucursalesLista");
-            List<Doctor> listaDocs = new List<Doctor>();
-            //print List title
-
-            foreach (var g in list3)
-            {
-                Console.WriteLine(g["Title"]);
-                
-            }
-            Console.WriteLine(" ");
             IEnumerable<JToken> b = list;
-            foreach (var g in list2)
-            {
-                Console.WriteLine(g["Title"]);
-
-            }
-            Console.WriteLine(" ");
             foreach (var a in b)
             {
-                
+
                 Doctor docAgregado = new Doctor();
                 docAgregado.NombreCompleto = a["Title"].ToString();
                 docAgregado.Especialidad = a["Especialidad"].ToString();
                 docAgregado.Dias = a["DiasDeAtencion"].ToString();
                 docAgregado.HoraEntrada = int.Parse(a["HoraEntrada"].ToString());
                 docAgregado.HoraSalida = int.Parse(a["HoraSalida"].ToString());
+                docAgregado.Sucursal = a["Sucursal"].ToString();
                 listaDocs.Add(docAgregado);
                 /*Console.Write(a["Title"]);
                 Console.Write("----");
@@ -62,24 +80,49 @@ namespace SharePoint_test
                 Console.Write(a["HoraSalida"]);
                 Console.WriteLine(" ");*/
             }
+            return listaDocs;
+        }
 
-            foreach (var doc in listaDocs)
+        public List<string> GetEspecialidades()
+        {
+            List<string> listaEspecialidades = new List<string>();
+            var webUri = new Uri("https://softtekssh.sharepoint.com/sites/Academia/Testing/Grupo1");
+            const string userName = "smo-sitiodeprueba@softtekssh.onmicrosoft.com";
+            const string password = "Softtek2017!";
+            var securePassword = new SecureString();
+            foreach (var c in password)
             {
-                Console.WriteLine(doc.ToString());
+                securePassword.AppendChar(c);
             }
-            //Console.WriteLine();
-            Console.ReadKey();
-            //IEnumerable<JToken> d = b.Children 
-            /*foreach (var a in b)
+            var credentials = new SharePointOnlineCredentials(userName, securePassword);
+            var list3 = GetList(webUri, credentials, "Especialidades");
+            foreach (var a in list3)
             {
-                foreach(var z in a)
-                {
-                    Console.WriteLine(z["Especialidad"]);
-                }
+                listaEspecialidades.Add(a["Title"].ToString());
+            }
 
+            return listaEspecialidades;
+        }
+
+        public List<string> GetSucursales()
+        {
+            List<string> listaSucursales = new List<string>();
+            var webUri = new Uri("https://softtekssh.sharepoint.com/sites/Academia/Testing/Grupo1");
+            const string userName = "smo-sitiodeprueba@softtekssh.onmicrosoft.com";
+            const string password = "Softtek2017!";
+            var securePassword = new SecureString();
+            foreach (var c in password)
+            {
+                securePassword.AppendChar(c);
             }
-            Console.WriteLine(list["Title"]);*/
-            Console.ReadLine();
+            var credentials = new SharePointOnlineCredentials(userName, securePassword);
+            var list3 = GetList(webUri, credentials, "SucursalesLista");
+            foreach (var a in list3)
+            {
+                listaSucursales.Add(a["Title"].ToString());
+            }
+
+            return listaSucursales;
         }
 
         public static JToken GetList(Uri webUri, ICredentials credentials, string listTitle)
@@ -97,18 +140,10 @@ namespace SharePoint_test
                 return t["d"]["results"];
             }
         }
-    }
-    public class Doctor
-    {
-        public string NombreCompleto { get; set; }
-        public string Especialidad{ get; set; }
-        public string Dias{ get; set; }
-        public int HoraEntrada{ get; set; }
-        public int HoraSalida { get; set; }
 
         public override string ToString()
         {
-            return "Nombre y Apellido : " + this.NombreCompleto + " Especialidad: " + this.Especialidad + " Dias que trabaja: " + this.Dias + " Horarios: " + this.HoraEntrada + " a " + this.HoraSalida;
+            return "Nombre y Apellido: " + this.NombreCompleto + " Especialidad: " + this.Especialidad + " Sucursal de trabajo: "+this.Sucursal+ " Dias que trabaja: " + this.Dias + " Horarios: " + this.HoraEntrada + " a " + this.HoraSalida;
         }
     }
 }
