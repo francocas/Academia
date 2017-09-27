@@ -147,3 +147,5 @@ namespace SharePoint_test
         }
     }
 }
+            /*var prueba = docs.Where(x => x.Especialidad == especialidad && x.Sucursal == sucursal)
+                .Select(item => item.HoraEntrada.ToString()).ToList();*/
